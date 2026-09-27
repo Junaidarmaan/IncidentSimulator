@@ -1,0 +1,14 @@
+package com.junnu.incidentsim.enums;
+
+public enum Service {
+    PAYMENT_SERVICE,
+    ORDER_SERVICE,
+    USER_SERVICE,
+    INVENTORY_SERVICE,
+    AUTH_SERVICE,
+    NOTIFICATION_SERVICE,
+    SEARCH_SERVICE,
+    API_GATEWAY,
+    REPORTING_SERVICE,
+    ANALYTICS_SERVICE
+}

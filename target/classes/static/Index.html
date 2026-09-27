@@ -1,0 +1,136 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Events</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .stack-trace,
+        .message {
+            white-space: pre-wrap;
+            max-width: 400px;
+            word-break: break-word;
+        }
+
+        .pagination {
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 8px 16px;
+            cursor: pointer;
+        }
+
+        button:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+
+<body>
+
+<h2>Events</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Incident ID</th>
+            <th>Timestamp</th>
+            <th>Severity</th>
+            <th>Service</th>
+            <th>Component</th>
+            <th>Message</th>
+            <th>Stack Trace</th>
+        </tr>
+    </thead>
+
+    <tbody id="eventsTableBody">
+    </tbody>
+</table>
+
+<div class="pagination">
+    <button id="nextButton" onclick="loadNextPage()">Next</button>
+</div>
+
+<script>
+    let currentPage = 0;
+
+    async function loadPage(page) {
+        try {
+            const response = await fetch(`/events?page=${page}`);
+
+            if (!response.ok) {
+                throw new Error("Failed to fetch events");
+            }
+
+            const data = await response.json();
+
+            const tableBody = document.getElementById("eventsTableBody");
+
+            tableBody.innerHTML = "";
+
+            data.content.forEach(event => {
+                const row = document.createElement("tr");
+
+                row.innerHTML = `
+                    <td>${event.id}</td>
+                    <td>${event.incidentId}</td>
+                    <td>${event.timestamp}</td>
+                    <td>${event.severity}</td>
+                    <td>${event.service}</td>
+                    <td>${event.component}</td>
+                    <td class="message">${event.message ?? ""}</td>
+                    <td class="stack-trace">${event.stackTrace ?? ""}</td>
+                `;
+
+                tableBody.appendChild(row);
+            });
+
+            // Disable Next when there are no more pages
+            document.getElementById("nextButton").disabled = data.last;
+
+        } catch (error) {
+            console.error("Error loading events:", error);
+        }
+    }
+
+    function loadNextPage() {
+        currentPage++;
+        loadPage(currentPage);
+    }
+
+    // Load first page when the page opens
+    loadPage(currentPage);
+</script>
+
+</body>
+</html>
